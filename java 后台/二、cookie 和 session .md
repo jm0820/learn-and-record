@@ -143,4 +143,137 @@ if(cookies != null && cookies.length > 0){
         <!--这个30的单位是分钟-->
         <session-timeout>30</session-timeout>
     </session-config>
-    ‵‵`
+    ‵‵`     
+注意:关闭浏览器只会使存储在客户端浏览器内存中的session cookie 失效,不会使服务器端的session对象失效.  
+
+**HttpSession 的相关API**   
+- 获取Session 对象：   
+```request.getSession()/request.getSession(Boolean create)```
+- 属性相关的:   
+```setAttribute()、getAttribute()、remoevAttribute()```
+- 使HttpSession失效的方法:   
+```invalidate()```
+- 设置其最大时效的:   
+```setMaxInactiveInterval()```   
+
+**三、利用URL重写实现Session跟踪**   
+- Servlet 规范中引入了一种补充的会话管理机制，它允许不支持Cookie的浏览器也可以与WEB服务器保持连续的会话。这种补充机制要求在响应消息的实体内容中必须包含下一次请求的超链接，并将会话标识号作为超链接URL地址的一个特殊参数.
+- 将会话标识号以参数形式附加在超链接的URL地址后面的技术成为URL重写.
+如果在浏览器不支持Cookie 或者关闭了Cookie 功能的情况下，WEB服务器还要能够与浏览器实现由状态的会话，就必须对所有可能被客户端访问的请求路径（包括超链接、form表单的action属性设置和重定向的URL）进行URL重写.
+- HttpServletResponse 接口中定义了两个用于完成URL重写方法:
+    - encodeURL 方法
+    - encodeRedirectURL方法
+```
+<a href="<%=response.encodeURL("login.jsp")%>">重新登录
+<a href="<%=response.encodeURL("logout.jsp")%>">注销</a>
+```    
+encodeURL()的实现机制
+
+- 先判断当前的 Web 组件是否启用 Session，如果没有启用Session，直接返回参数 url。
+- 再判断客户端浏览器是否支持 Cookie，如果支持 Cookie，直接返回参数 url；如果不支持 Cookie，就在参数 url 中加入 Session ID 信息，然后返回修改后的 url。    
+
+
+**绝对路径的问题**   
+1. 开发时建议编写"绝对路径":写绝对路径肯定没有问题，但写相对路劲可能会有问题.
+2. 在由Servlet转发到JSP页面时，此时浏览器地址栏上显示的是Servlet的路径，而若JSP页面的超链接还是相对于该JSP页面的地址，则可能出现路径混乱的问题.
+3. 在javaWeb中什么叫"绝对路径":相对于当前Web应用的根路径的路径.
+contextPath:当前Web应用的上下文路径，任何的路径都必须带上contextPath.
+4. 若 / 代表的是站点的根目录，在其前面加上contextPath就可以了，而contextPath 可以由request或application 的getContextPath()方法获取.   
+
+javaWEB 开发中的"/"代表什么？  
+- 当前WEB应用的根路径:```http://localhost:8080/contextPath/```
+
+    - 请求转发时
+    ```
+    request.getRequestdispatcher("/path/b.jsp").forward(request,response)
+    ```
+    - web.xml 文件中映射Servlet访问路径.
+   ```
+   <servlet-mapping>
+      <servlet-name>initServlet</servlet-name>
+      <url-pattern>/initServlet</url-pattern>
+   </servlet-mapping>
+    ```   
+    
+- WEB站点的根路径:http://localhost:8080/
+
+    - 超链接:
+    ```
+    <a href="/listAllStudents">List All Students</a>
+    ```
+    - 表单中的action:
+    ```
+    <form action="/processStep1" method="post">
+    ```
+    - 做请求重定向的时候
+    ```
+    response.sendRedirect("/a.jsp");
+    ```    
+    >若 "/" 需交由Servlet 容器来处理，则代表Web应用
+若 "/" 交由浏览器来处理,则代表WEB站点
+请求转发时由Servlet容器进行转发，浏览器不知道，所以请求转发时/代表当前web应用，请求重定向是由浏览器进行处理，所以/代表WEB站点   
+
+
+**表单的重复提交**  
+**一、问题描述**   
+- 调用```RequestDispatcher.forward()```方法，浏览器所保留的URL是先前的表单提交的URL,此时点击"刷新",浏览器将再次提交用户先前输入的数据，引起重复提交.
+- 如果采用```HttpServletResponse.sendRedirect()```方法将客户端重定向到成功页面，将不会出现重复提交问题.        
+
+1.重复提交的情况
+
+- 在表单提交到一个Servlet,而Servlet 又通过请求转发的方式响应了一个JSP或HTML页面.此时地址栏里面还保留着Servlet 的那个路径，在响应页面点击```刷新```.
+- 在响应页面没有到达重复点击```提交```按钮
+- 点击```返回```，再点击```提交```
+2.不属于重复提交的情况
+
+- 点击```返回```,```刷新```了原页面,再```提交```.   
+
+**二、如何避免表单重复提交**   
+在表单中做一个标记，提交到Servlet时，检查标记是否存在且是否和预定义的标记一致，若一致，则受理请求并销毁标记,若不一致或没有标记，则直接响应信息:"重复提交".
+
+- 在原表单页面，生成一个随机的token，把token 值放入session 属性中，把token 值放入隐藏域中.   
+
+```
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+    <head>
+        <title>Title</title>
+    </head>
+    <body>
+        <%
+            <%--生成一个token并放入session中--%>
+            String tokenValue = new Date().getTime() + "";
+            session.setAttribute("token",tokenValue);
+
+        %>
+        <form action="<%=request.getContextPath()%>/tokenServlet" method="post">
+            //把token 放入隐藏域中
+            <input type="hidden" name="token" value="<%=tokenValue%>"/>
+            name:<input type="text" name="name"/>
+            <input type="submit" value="Submit"/>
+        </form>
+    </body>
+</html>
+```   
+
+- 在目标的Servle中,获取Session和隐藏域中的token值,比较两个值是否一致：若一致，受理请求，且把session域中的token属性清除;若不一致，则直接响应提示页面:"重复提交"
+```
+@Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String name = req.getParameter("name");
+        HttpSession session = req.getSession();
+        //获取sesssion中的token
+        Object token = session.getAttribute("token");
+        //获取隐藏域的token
+        String tokenValue = req.getParameter("token");
+        if(token != null && token.equals(tokenValue)){
+            session.removeAttribute("token");
+        }else{
+            //重定向到错误页面
+            resp.sendRedirect(req.getContextPath()+"/token/token.jsp");
+            return;
+        }
+       //转发到成功页面，session 依然存在
+        resp.sendRedirect(req.getContextPath()+"/token/success.jsp");
+    }
+```   
