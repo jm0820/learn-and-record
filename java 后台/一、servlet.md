@@ -131,7 +131,7 @@ Servlet 程序必须在WEB应用程序的web.xml文件中进行注册和映射�
   </servlet-mapping>
 ```   
 
-Servlet 映射细节   
+**Servlet 映射细节**   
 一个Servlet 可以被映射到多个url,即多个元素的子元素的设置值可以是同一个Servlet 的注册名
 ```
 <servlet-mapping>
@@ -216,7 +216,7 @@ getOut()|	返回out
 
 二、Servletrequest
 
--生命周期   
+- 生命周期   
 在service方法调用前由服务器创建，传入service()方法，整个请求结束，ServletRequest生命周期结束。
 - 作用范围   
 仅在当前请求中有效，请求的转发也是一个请求。
@@ -344,8 +344,8 @@ resp.sendRedirect(path);
 请求转发：只能转发给当前WEB应用的资源
 请求重定向：可以重定向到任何资源
 
-请求转发：/代表的是当前WEB应用的根目录 http://localhost:8080/project/
-请求重定向：/代表的是当前WEB站点的根目录http://localhost:8080/
+请求转发：/代表的是当前WEB应用的根目录 ```http://localhost:8080/project/```
+请求重定向：/代表的是当前WEB站点的根目录 ```http://localhost:8080/```
 
 
 
@@ -380,8 +380,7 @@ private transient ServletConfig config;
 ```
 
 通过这个对象实现了ServletConfig 的方法。   
-- Servlet
-GenericServelt 实现了 Servlet 的除service()外所有的方法，GenericServelt这个抽象类只有一个抽象方法就是service()，我们继承GenericServlet 去实现Servlet 的时候只需要实现service()就可以了。
+- ServletGenericServelt 实现了 Servlet 的除service()外所有的方法，GenericServelt这个抽象类只有一个抽象方法就是service()，我们继承GenericServlet 去实现Servlet 的时候只需要实现service()就可以了。
 
 **init()和init(ServletConfig config)**
 ```
@@ -560,41 +559,4 @@ public class MyHttpServletRequest extends MyGenericServlet {
 
     }
 }
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```   
