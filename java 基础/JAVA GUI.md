@@ -62,9 +62,73 @@ java 主要提供了三个主要的包做GUI开发：
 
 ​	Swing是AWT的扩展，它提供了许多新的图形界面组件。Swing组件以“J”开头，除了拥有与AWT类似	的按钮（JButton)、标签（JLabel)、复选框（JCheckBox)、菜单（JMenu）等基本组件外，还增加了一个丰富的高层组件集合，如表格（JTable）、树（JTree）。在javax.swing包中，定义了两种类型的组件：顶层容器（Jframe、Japplet、JDialog和JWindow）和轻量级组件。
 
+​	使用swing 组件创建程序是因为它比AWT更专业，而且swing 提供更多得附加元素。比如说，通过Swing 和JEditorPanel 组件可以在java程序中使用HTML格式文本。而AWT实现同样功能不但苦难你，而且要花费相当多的时间
+
+ 	swing 并不能使程序更加容易编写，但是可以使程序更加美观，而且容易在其他平台上运行。swing 组件比一般AWT 组件强大的多
+
+​	awt 分为两部分，一部分可以安全的混入swing 类，另一部分要用swing的等价类对其替换
+
+
+
+## 组件与容器
+
+组件：基本图形元素，如按钮，文本框域，多选按钮，单选按钮等。
+
+容器：可以容纳组件的区域，在容器上加别的组件。如：Frame，Window等。
+
+注意：容器中可以容纳组件，也可以容纳比它的“容器小”的容器。
+
+
+
+### 顶级容器
+
+| 容器      | 功能                                       | 备注   |
+| ------- | ---------------------------------------- | ---- |
+| Jframe  | 用于框架窗口的类，此窗口嗲有边框、标题、用于关闭和最小化窗口的图标等。带GUI的应用程序通常至少使用一个框架窗口 |      |
+| JDialog | 用于对话框的类                                  |      |
+| JApplet | 用于使用Swing 组件的Java Applet 的类              |      |
+
+### 中间容器
+
+| 容器          | 功能                               | 备注   |
+| ----------- | -------------------------------- | ---- |
+| JPanel      | 最灵活，最常用的中间组件                     |      |
+| JScrollPane | 与JPanel 类似，但还可在大的组件或可扩展组件周围提供滚动条 |      |
+| JTabbedPane | 包含多个组件，但一次只显示一个组件。               |      |
+| JToolBar    | 按行或列排列一组组件（通常是按钮）                |      |
+
+
+
+JPanel 容器
+
+- JPanel 是最简单的容器类，应用程序可以将其他组件放在面板提供的空间内。
+- JPanel 只能存在于其他的容器（windows 或其子类）中，一般被放入Frame
+- JFrame 可以被划分为若干个JPanel,然后在JPanel 上进一步进行组件布局
+- 面板的默认布局管理器是FlowLayout 布局管理器
+- 不能为JPnel设置标题
+
+| 函数原型                                 | 说明                |
+| ------------------------------------ | ----------------- |
+| JPanel()                             | 创建默认布局（FlowLayot） |
+| Jpanel(LayoutManager layout)         | 以指定的布局管理器创建面板     |
+| void setLayout(LayoutManager layout) | 以指定布局管理器设置面板的布局   |
+| Component add(Component comp)        | 往面板内添加控件          |
+| void setBackgroud(Color bg)          | 设置面板的背景色          |
+
 
 
 ## AWT
+
+java.awt 包是Java内置的包，属于java 基本类库的一部分，其中包括以下内容：
+
+- 便于用户输入的一组丰富的界面组件
+- 将组件放置在适当位置的几种布局管理器
+- 事件处理模型
+- 图形和图像工具类
+
+![awt组件体系结构](./picture/awt组件库.png)
+
+
 
 https://wenku.baidu.com/view/5314a4e2524de518964b7dca?aggId=f35020f74a649b6648d7c1c708a1284ac85005ad&fr=catalogMain_text_ernie_recall_v1:wk_recommend_main5
 
@@ -73,6 +137,12 @@ https://wenku.baidu.com/view/5314a4e2524de518964b7dca?aggId=f35020f74a649b6648d7
 
 
 
+
+![awt组件体系结构](./picture/swing组件库.png)
+
+
+
+111
 
 ## 参考
 
